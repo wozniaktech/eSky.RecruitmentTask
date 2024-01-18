@@ -6,9 +6,16 @@ namespace eSky.RecruitmentTask.Services
 {
     public class AuthorService : IAuthorService
     {
-        HttpClient client = new HttpClient();
+        private readonly IHttpClientFactory _httpClientFactory;
+        public AuthorService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        //HttpClient client = new HttpClient();
         const string authorsPath = "https://poetrydb.org/authors";
         const string poemsPath = "https://poetrydb.org/author/";
+
 
         public async Task<List<Author>> GetPoemsByAuthor(List<string> authors)
         {
@@ -17,9 +24,11 @@ namespace eSky.RecruitmentTask.Services
 
             if ((authors != null) && (authors.Any()))
             {
-                foreach (var author in authors) 
+                foreach (var author in authors)
                 {
-                    var response = await client.GetAsync(poemsPath + author);
+                    //var response = await client.GetAsync(poemsPath + author);
+                    var httpClient = _httpClientFactory.CreateClient();
+                    var response = await httpClient.GetAsync(poemsPath + author);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -33,14 +42,14 @@ namespace eSky.RecruitmentTask.Services
                         {
                             Poems = new List<string>()
                         };
-                      
+
                         foreach (var peom in poems)
                         {
-                            if (String.IsNullOrEmpty(newAuthor.Name)) 
+                            if (String.IsNullOrEmpty(newAuthor.Name))
                             {
                                 newAuthor.Name = peom.Author;
                             }
-                            
+
                             newAuthor.Poems.Add(peom.Title);
                         }
                         authorsList.Add(newAuthor);
@@ -56,7 +65,8 @@ namespace eSky.RecruitmentTask.Services
                 throw new ArgumentOutOfRangeException("Number of authors should be bigger then zero!", nameof(numberOfAuthors));
 
             AuthorsList? authors = new AuthorsList();
-            var response = await client.GetAsync(authorsPath);
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetAsync(authorsPath);
             List<string> result = new List<string>();
 
             if (response.IsSuccessStatusCode)
