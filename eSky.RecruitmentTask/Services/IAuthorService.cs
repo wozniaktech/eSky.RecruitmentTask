@@ -4,7 +4,8 @@ namespace eSky.RecruitmentTask.Services
 {
     public interface IAuthorService
     {
-        Task<List<string>> GetAuthors(int numberOfAuthors);
-        Task<List<Author>> GetPoemsByAuthor(List<string> authors);
+        Task<IEnumerable<string>> GetAuthors(int numberOfAuthors);
+        //Task<IEnumerable<Author>> GetPoemsByAuthor(IEnumerable<string> authors);
+        Task<IEnumerable<Poem>> GetPoems2(IEnumerable<string> authors);
     }
 }

@@ -24,7 +24,9 @@ namespace eSky.RecruitmentTask.Controllers
                 return NoContent();
             }
 
-            var poems = await _authorService.GetPoemsByAuthor(authors);
+            //var poems = await _authorService.GetPoemsByAuthor(authors);
+
+            var poems = await _authorService.GetPoems2(authors);
 
             if(poems == null || !poems.Any())
             {

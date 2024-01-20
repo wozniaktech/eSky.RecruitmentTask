@@ -1,81 +1,235 @@
-﻿using eSky.RecruitmentTask.Helper;
+﻿using eSky.RecruitmentTask.Config;
+using eSky.RecruitmentTask.Helper;
 using eSky.RecruitmentTask.Models;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace eSky.RecruitmentTask.Services
 {
     public class AuthorService : IAuthorService
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public AuthorService(IHttpClientFactory httpClientFactory)
+        private readonly IHttpService _httpService;
+        private readonly EndpointConfig _endpoints;
+
+        public AuthorService(IHttpService httpService, IOptionsMonitor<EndpointConfig> endpointConfig)
         {
-            _httpClientFactory = httpClientFactory;
+            _httpService = httpService;
+            _endpoints = endpointConfig.CurrentValue;
         }
 
-        //HttpClient client = new HttpClient();
-        const string authorsPath = "https://poetrydb.org/authors";
-        const string poemsPath = "https://poetrydb.org/author/";
-
-
-        public async Task<List<Author>> GetPoemsByAuthor(List<string> authors)
+        public IEnumerable<Author> GetP(IEnumerable<Poem>? poems, List<string> authors)
         {
-            var poems = new List<Poem>();
+            if ((poems == null) || (!poems.Any()))
+                throw new ArgumentOutOfRangeException("List of poems can't by null or empty", nameof(poems));
+
+            if (string.IsNullOrEmpty(_endpoints.Authors))
+                throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
+
             var authorsList = new List<Author>();
 
-            if ((authors != null) && (authors.Any()))
+            foreach (var author in authors) 
             {
-                foreach (var author in authors)
+                var newAuthor = new Author()
                 {
-                    //var response = await client.GetAsync(poemsPath + author);
-                    var httpClient = _httpClientFactory.CreateClient();
-                    var response = await httpClient.GetAsync(poemsPath + author);
+                    Name = author,
+                    Poems = new List<string>()
+                };
 
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var res = response.Content.ReadAsStringAsync().Result;
-                        poems = JsonConvert.DeserializeObject<List<Poem>>(res);
+                foreach (var peom in poems)
+                {
+                    if (newAuthor.Name == peom.Author )
+                    { 
+                        newAuthor.Poems.Add(peom.Title);
                     }
-                    // Get authors with poems only.
-                    if ((poems != null) && (poems.Any()))
+
+                    //if (String.IsNullOrEmpty(newAuthor.Name))
+                    //{
+                    //    newAuthor.Name = peom.Author;
+                    //}
+
+                    //newAuthor.Poems.Add(peom.Title);
+                }
+                authorsList.Add(newAuthor);
+            }
+
+
+           
+               
+
+               
+            return authorsList;
+            
+        }
+
+        public async Task<IEnumerable<Poem>> GetPoems2(IEnumerable<string> authors)
+        {
+            if (string.IsNullOrEmpty(_endpoints.Authors))
+                throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
+
+            //I used list below because I need AddRange method, which is not available in IEnumerable, ICollection nor IList
+            List<Poem> poems = new List<Poem>();
+            
+            if (authors.Any())
+            {
+                var poemsTasks = authors.Select(author => _httpService.GetAsync(_endpoints.Poems + author));
+                var poemsResponses = await Task.WhenAll(poemsTasks);
+
+                if(poemsResponses.Any())
+                {
+                    foreach (var response in poemsResponses)
                     {
-                        var newAuthor = new Author()
+                        if (response.IsSuccessStatusCode)
                         {
-                            Poems = new List<string>()
-                        };
+                            var res = await response.Content.ReadAsStringAsync();
 
-                        foreach (var peom in poems)
-                        {
-                            if (String.IsNullOrEmpty(newAuthor.Name))
+                            if (!string.IsNullOrEmpty(res))
                             {
-                                newAuthor.Name = peom.Author;
+                                var listOfPoems = JsonConvert.DeserializeObject<List<Poem>>(res);
+                                if (listOfPoems != null)
+                                {
+                                    poems.AddRange(listOfPoems);
+                                }
                             }
-
-                            newAuthor.Poems.Add(peom.Title);
                         }
-                        authorsList.Add(newAuthor);
                     }
                 }
             }
-            return authorsList;
-        }
+            return poems;
+         }
 
-        public async Task<List<string>> GetAuthors(int numberOfAuthors)
+
+        //public async Task<IEnumerable<Poem>> GetPoems(IEnumerable<string> authors)
+        //{
+        //    if (string.IsNullOrEmpty(_endpoints.Authors))
+        //        throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
+
+        //    List<Poem> poems = new List<Poem>();
+        //    ICollection<Task<HttpResponseMessage>> taskList = new List<Task<HttpResponseMessage>>();
+         
+        //    if (authors.Any())
+        //    {
+        //        foreach (var author in authors)
+        //        {
+        //            //taskList.Add("_httpService.GetAsync(_endpoints.Poets + author)");
+        //            taskList.Add(_httpService.GetAsync(_endpoints.Poems + author));
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new ArgumentNullException("There are no authors", nameof(authors));
+        //    }
+
+        //    try
+        //    {
+        //        var responses = await Task.WhenAll(taskList);
+        //        if(responses.Any())
+        //        {
+        //            foreach (var response in responses)
+        //            {
+        //                var res = await response.Content.ReadAsStringAsync();
+        //                var listOfPoems = JsonConvert.DeserializeObject<List<Poem>>(res);
+        //                if (listOfPoems != null)
+        //                {
+        //                    poems.AddRange(listOfPoems);
+        //                }
+        //                else
+        //                {
+        //                    throw new ArgumentNullException("List of poems is null or empty", nameof(listOfPoems));
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        throw new Exception($"Error occurred: {ex.Message}");
+        //    }
+        //    return poems;
+        //}        
+                
+        //public async Task<List<Author>> GetPoemsByAuthor(List<string> authors)
+        //{
+        //    var poems = new List<Poem>();
+        //    var authorsList = new List<Author>();
+
+        //    //var p = GetPoems(authors).Result;
+        //    //var a = GetP(p, authors);
+
+        //    if ((authors != null) && (authors.Any()))
+        //    {
+        //        foreach (var author in authors)
+        //        {
+        //            //var response = await client.GetAsync(poemsPath + author);
+        //            //var httpClient = _httpClientFactory.CreateClient();
+        //            //var response = await httpClient.GetAsync(_endpoints.Poets + author);
+        //            var response = await _httpService.GetAsync(_endpoints.Poems+author);
+
+                    
+
+        //            if (response.IsSuccessStatusCode)
+        //            {
+        //                var res = response.Content.ReadAsStringAsync().Result;
+        //                poems = JsonConvert.DeserializeObject<List<Poem>>(res);
+        //            }
+        //            // Get authors with poems only.
+        //            if ((poems != null) && (poems.Any()))
+        //            {
+        //                var newAuthor = new Author()
+        //                {
+        //                    Poems = new List<string>()
+        //                };
+
+        //                foreach (var peom in poems)
+        //                {
+        //                    if (String.IsNullOrEmpty(newAuthor.Name))
+        //                    {
+        //                        newAuthor.Name = peom.Author;
+        //                    }
+
+        //                    newAuthor.Poems.Add(peom.Title);
+        //                }
+        //                authorsList.Add(newAuthor);
+        //            }
+        //        }
+        //    }
+        //    return authorsList;
+        //}
+
+        public async Task<IEnumerable<string>> GetAuthors(int numberOfAuthors)
         {
             if (numberOfAuthors <= 0)
                 throw new ArgumentOutOfRangeException("Number of authors should be bigger then zero!", nameof(numberOfAuthors));
 
             AuthorsList? authors = new AuthorsList();
-            var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.GetAsync(authorsPath);
-            List<string> result = new List<string>();
+            IEnumerable<string> result;
 
-            if (response.IsSuccessStatusCode)
+            var response = await _httpService.GetAsync(_endpoints.Authors);
+            if(response.IsSuccessStatusCode) 
             {
-                var res = response.Content.ReadAsStringAsync().Result;
-                authors = JsonConvert.DeserializeObject<AuthorsList>(res);
-                result = authors.Authors.GetRandomAuthors(numberOfAuthors);
+                try
+                {
+                    var res = await response.Content.ReadAsStringAsync();
+                    authors = JsonConvert.DeserializeObject<AuthorsList>(res);
+                    
+                    if (authors != null)
+                    {
+                        result = authors.Authors.GetRandomAuthors(numberOfAuthors);
+                        return result;
+                    }
+                    else
+                    {
+                        throw new Exception("List of authors is null or empty");
+                    }
+                }
+                catch (Exception ex) 
+                {
+                    throw new Exception($"Can't parse authors, {ex.Message}");
+                }
             }
-            return result;
+            else
+            {
+                throw new Exception("Can't retrieve authors from server");
+            }
         }
     }
 }

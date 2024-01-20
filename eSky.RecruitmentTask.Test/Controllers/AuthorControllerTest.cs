@@ -17,7 +17,7 @@ namespace eSky.RecruitmentTask.Test.Controllers
             var authors = AuthorMockService.GetAuthors(numberOfAuthors);
             var authorService = new Mock<IAuthorService>();
             authorService.Setup(_ => _.GetAuthors(numberOfAuthors)).ReturnsAsync(AuthorMockService.GetAuthors(numberOfAuthors));
-            authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthor(authors));
+            //authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthor(authors));
             var sut = new AuthorsController(authorService.Object);
 
             //Act
@@ -36,7 +36,7 @@ namespace eSky.RecruitmentTask.Test.Controllers
             var authors = AuthorMockService.GetAuthors(numberOfAuthors);
             var authorService = new Mock<IAuthorService>();
             authorService.Setup(_ => _.GetAuthors(numberOfAuthors)).ReturnsAsync(AuthorMockService.GetAuthorsNoData(numberOfAuthors));
-            authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthor(authors));
+            //authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthor(authors));
             var sut = new AuthorsController(authorService.Object);
 
             //Act
@@ -55,7 +55,7 @@ namespace eSky.RecruitmentTask.Test.Controllers
             var authors = AuthorMockService.GetAuthors(numberOfAuthors);
             var authorService = new Mock<IAuthorService>();
             authorService.Setup(_ => _.GetAuthors(numberOfAuthors)).ReturnsAsync(AuthorMockService.GetAuthors(numberOfAuthors));
-            authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthorNoData(authors));
+            //authorService.Setup(_ => _.GetPoemsByAuthor(authors)).ReturnsAsync(AuthorMockService.GetPoemsByAuthorNoData(authors));
             var sut = new AuthorsController(authorService.Object);
 
             //Act
