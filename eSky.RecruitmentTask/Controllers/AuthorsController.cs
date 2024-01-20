@@ -26,13 +26,21 @@ namespace eSky.RecruitmentTask.Controllers
 
             //var poems = await _authorService.GetPoemsByAuthor(authors);
 
-            var poems = await _authorService.GetPoems2(authors);
+            var poems = await _authorService.GetPoems(authors);
 
             if(poems == null || !poems.Any())
             {
                 return NoContent();
             }
-            return Ok(poems);
+            //return Ok(poems);
+
+            var poemsByAuthor = _authorService.GetPoemsByAuthor(poems, authors);
+            if (poemsByAuthor == null || !poemsByAuthor.Any())
+            {
+                return NoContent();
+            }
+
+            return Ok(poemsByAuthor);
         }
     }
 }

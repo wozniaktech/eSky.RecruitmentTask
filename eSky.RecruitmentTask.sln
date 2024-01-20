@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eSky.RecruitmentTask", "eSky.RecruitmentTask\eSky.RecruitmentTask.csproj", "{75EAAA0B-A917-46FD-9563-9DBE2BF1D69E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eSky.RecruitmentTask.Test", "eSky.RecruitmentTask.Test\eSky.RecruitmentTask.Test.csproj", "{920FCEAE-5E44-4D5B-AC11-7F343DB8DBE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eSky.RecruitmentTask.Test", "eSky.RecruitmentTask.Test\eSky.RecruitmentTask.Test.csproj", "{920FCEAE-5E44-4D5B-AC11-7F343DB8DBE2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
