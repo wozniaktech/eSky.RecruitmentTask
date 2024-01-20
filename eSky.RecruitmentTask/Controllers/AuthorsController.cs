@@ -35,7 +35,7 @@ namespace eSky.RecruitmentTask.Controllers
                 return NoContent();
             }
           
-            var poemsByAuthor = _authorService.GetPoemsByAuthor(poems, authors);
+            var poemsByAuthor = await _authorService.GetPoemsByAuthor(poems, authors);
             if (poemsByAuthor == null || !poemsByAuthor.Any())
             {
                 _logger.LogError(ErrorMessages.CANNOT_GET_LIST_OF_POEMSBYAUTHOR);
