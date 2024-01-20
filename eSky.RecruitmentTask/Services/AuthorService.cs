@@ -9,21 +9,29 @@ namespace eSky.RecruitmentTask.Services
     public class AuthorService : IAuthorService
     {
         private readonly IHttpService _httpService;
+        private readonly ILogger _logger;
         private readonly EndpointConfig _endpoints;
 
-        public AuthorService(IHttpService httpService, IOptionsMonitor<EndpointConfig> endpointConfig)
+        public AuthorService(IHttpService httpService, 
+            IOptionsMonitor<EndpointConfig> endpointConfig, 
+            ILogger<AuthorService> logger)
         {
             _httpService = httpService;
             _endpoints = endpointConfig.CurrentValue;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<string>> GetAuthors(int numberOfAuthors)
         {
             if (numberOfAuthors <= 0)
-                throw new ArgumentOutOfRangeException("Number of authors should be bigger then zero!", nameof(numberOfAuthors));
-
+            {
+                _logger.LogError(ErrorMessagesHelper.INCORRECT_NUMBER_OF_AUTHORS);
+                throw new ArgumentOutOfRangeException(ErrorMessagesHelper.INCORRECT_NUMBER_OF_AUTHORS, 
+                    nameof(numberOfAuthors));
+            }
+                
             AuthorsList? authors = new AuthorsList();
-            IEnumerable<string> result;
+            IEnumerable<string> result = Enumerable.Empty<string>();
 
             var response = await _httpService.GetAsync(_endpoints.Authors);
             if (response.IsSuccessStatusCode)
@@ -36,21 +44,20 @@ namespace eSky.RecruitmentTask.Services
                     if (authors != null)
                     {
                         result = authors.Authors.GetRandomAuthors(numberOfAuthors);
-                        return result;
+                        
                     }
-                    else
-                    {
-                        throw new Exception("List of authors is null or empty");
-                    }
+                    return result;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw new Exception($"Can't parse authors, {ex.Message}");
+                    _logger.LogError(ErrorMessagesHelper.CANNOT_DESERIALIZE_AUTHORS_LIST);
+                    throw new Exception(ErrorMessagesHelper.CANNOT_DESERIALIZE_AUTHORS_LIST);
                 }
             }
             else
             {
-                throw new Exception("Can't retrieve authors from server");
+                _logger.LogError(ErrorMessagesHelper.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
+                throw new Exception(ErrorMessagesHelper.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
             }
         }
 
@@ -59,7 +66,7 @@ namespace eSky.RecruitmentTask.Services
             if (string.IsNullOrEmpty(_endpoints.Authors))
                 throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
 
-            //I used list below because I need AddRange method, which is not available in IEnumerable, ICollection nor IList
+            //I used list below because I needed AddRange method, which is not available in IEnumerable, ICollection nor IList
             List<Poem> poems = new List<Poem>();
 
             if (authors.Any())
@@ -98,7 +105,7 @@ namespace eSky.RecruitmentTask.Services
             if (string.IsNullOrEmpty(_endpoints.Authors))
                 throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
 
-            var authorsList = new List<Author>();
+            ICollection<Author> authorsList = new List<Author>();
 
             foreach (var author in authors) 
             {
@@ -119,12 +126,5 @@ namespace eSky.RecruitmentTask.Services
             }
             return authorsList;
         }
-
-        
-
-
-        
-
-        
     }
 }

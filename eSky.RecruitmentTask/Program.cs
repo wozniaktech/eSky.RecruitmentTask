@@ -13,6 +13,8 @@ builder.Services.AddTransient<IAuthorService, AuthorService>();
 builder.Services.AddTransient<IHttpService, HttpService>();
 builder.Services.AddHttpClient();
 builder.Services.Configure<EndpointConfig>(builder.Configuration.GetSection("Endpoints"));
+//builder.Logging.ClearProviders();
+//builder.Logging.AddConsole();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

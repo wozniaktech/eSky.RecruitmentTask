@@ -18,22 +18,17 @@ namespace eSky.RecruitmentTask.Controllers
         public async Task<IActionResult> GetPoemsByAuthor(int numberOfAuthors = 3)
         {
             var authors = await _authorService.GetAuthors(numberOfAuthors);
-
             if (authors == null || !authors.Any()) 
             {
                 return NoContent();
             }
-
-            //var poems = await _authorService.GetPoemsByAuthor(authors);
-
+                      
             var poems = await _authorService.GetPoems(authors);
-
             if(poems == null || !poems.Any())
             {
                 return NoContent();
             }
-            //return Ok(poems);
-
+          
             var poemsByAuthor = _authorService.GetPoemsByAuthor(poems, authors);
             if (poemsByAuthor == null || !poemsByAuthor.Any())
             {
