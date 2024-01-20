@@ -25,8 +25,8 @@ namespace eSky.RecruitmentTask.Services
         {
             if (numberOfAuthors <= 0)
             {
-                _logger.LogError(ErrorMessagesHelper.INCORRECT_NUMBER_OF_AUTHORS);
-                throw new ArgumentOutOfRangeException(ErrorMessagesHelper.INCORRECT_NUMBER_OF_AUTHORS, 
+                _logger.LogError(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS);
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS, 
                     nameof(numberOfAuthors));
             }
                 
@@ -50,21 +50,24 @@ namespace eSky.RecruitmentTask.Services
                 }
                 catch (Exception)
                 {
-                    _logger.LogError(ErrorMessagesHelper.CANNOT_DESERIALIZE_AUTHORS_LIST);
-                    throw new Exception(ErrorMessagesHelper.CANNOT_DESERIALIZE_AUTHORS_LIST);
+                    _logger.LogError(ErrorMessages.CANNOT_DESERIALIZE_AUTHORS_LIST);
+                    throw new Exception(ErrorMessages.CANNOT_DESERIALIZE_AUTHORS_LIST);
                 }
             }
             else
             {
-                _logger.LogError(ErrorMessagesHelper.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
-                throw new Exception(ErrorMessagesHelper.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
+                _logger.LogError(ErrorMessages.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
+                throw new Exception(ErrorMessages.CANNOT_RETRIEVE_AUTHORS_FROM_SERVER);
             }
         }
 
         public async Task<IEnumerable<Poem>> GetPoems(IEnumerable<string> authors)
         {
-            if (string.IsNullOrEmpty(_endpoints.Authors))
-                throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
+            if ((authors == null) || (!authors.Any()))
+            {
+                _logger.LogError(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS);
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS, nameof(authors));
+            }
 
             //I used list below because I needed AddRange method, which is not available in IEnumerable, ICollection nor IList
             List<Poem> poems = new List<Poem>();
@@ -100,10 +103,16 @@ namespace eSky.RecruitmentTask.Services
         public IEnumerable<Author> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors)
         {
             if ((poems == null) || (!poems.Any()))
-                throw new ArgumentOutOfRangeException("List of poems can't by null or empty", nameof(poems));
+            {
+                _logger.LogError(ErrorMessages.INCORRECT_NUMBER_OF_POEMS);
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_POEMS, nameof(poems));
+            }
 
-            if (string.IsNullOrEmpty(_endpoints.Authors))
-                throw new ArgumentOutOfRangeException("List of authors can't by null or empty", nameof(authors));
+            if ((authors == null) || (!authors.Any()))
+            {
+                _logger.LogError(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS);
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS, nameof(authors));
+            }
 
             ICollection<Author> authorsList = new List<Author>();
 
