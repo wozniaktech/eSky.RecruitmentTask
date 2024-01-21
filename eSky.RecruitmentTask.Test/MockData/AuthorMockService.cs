@@ -1,66 +1,101 @@
-﻿using eSky.RecruitmentTask.Models;
+﻿using eSky.RecruitmentTask.Helper;
+using eSky.RecruitmentTask.Models;
 
 namespace eSky.RecruitmentTask.Test.MockData
 {
     public class AuthorMockService
     {
-        public static List<string> GetAuthors(int numberOfAuthors)
+        public static IEnumerable<string> GetAuthors(int numberOfAuthors)
         {
             if (numberOfAuthors <= 0)
-                throw new ArgumentOutOfRangeException("Number of authors should be bigger then zero!", nameof(numberOfAuthors));
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS,
+                  nameof(numberOfAuthors));
 
-            return new List<string>
+            IEnumerable<string> authors = new List<string>
             {
                 "Alexander Pope",
                 "James Whitcomb Riley",
                 "Ann Taylor"
             };
+
+            return authors;
         }
 
         public static List<string> GetAuthorsNoData(int numberOfAuthors)
         {
             if (numberOfAuthors <= 0)
-                throw new ArgumentOutOfRangeException("Number of authors should be bigger then zero!", nameof(numberOfAuthors));
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_AUTHORS,
+                  nameof(numberOfAuthors));
 
             return new List<string>();
         }
 
-        public static List<Author> GetPoemsByAuthor(List<string> authors)
+        public static IEnumerable<Poem>? GetPoems(IEnumerable<string> authors)
         {
-            if (authors == null && !authors.Any())
-                throw new ArgumentOutOfRangeException("No authors", nameof(authors));
+            if ((authors == null) || (!authors.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.LIST_OF_AUTHORS_CANT_BE_NULL_OR_EMPTY, nameof(authors));
+            }
 
-            return new List<Author>
+            IEnumerable<Poem> poems = new List<Poem> { 
+               new Poem
+               {
+                   Title = "Some title",
+                   Author = "Alexander Pope",
+                   Lines = new List<string> {"Line1","Line2","Line3"},
+                   Linecount = "Linecount"
+               },
+               new Poem
+               {
+                   Title = "Some title",
+                   Author = "James Whitcomb Riley",
+                   Lines = new List<string> {"Line1","Line2","Line3"},
+                   Linecount = "Linecount"
+               },
+                     new Poem
+               {
+                   Title = "Some title",
+                   Author = "",
+                   Lines = new List<string> {"Line1","Line2","Line3"},
+                   Linecount = "Linecount"
+               }
+            };
+
+            return poems;
+        }
+
+        public static IEnumerable<Poem>? NoPoems(IEnumerable<string> authors)
+        {
+            if ((authors == null) || (!authors.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.LIST_OF_AUTHORS_CANT_BE_NULL_OR_EMPTY, nameof(authors));
+            }
+
+            IEnumerable<Poem> poems = new List<Poem> {};
+
+            return poems;
+        }
+
+        public static IEnumerable<Author> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors)
+        {
+            if ((poems == null) || (!poems.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_POEMS, nameof(poems));
+            }
+
+            if ((authors == null) || (!authors.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.LIST_OF_AUTHORS_CANT_BE_NULL_OR_EMPTY, nameof(authors));
+            }
+
+            IEnumerable<Models.Author> listOfAuthors = new List<Author>
             {
                 new Author
                 {
-                    Name =  "Alexander Pope",
+                    Name = "Alexander Pope",
                     Poems = new List<string>
                     {
-                        "Epitaph. Intended for Sir Isaac Newton, in Westminster Abbey.",
-                        "Ode on St Cecilia's Day,",
-                        "The Alley.",
-                        "The Garden.",
-                        "Epitaph. on General Henry Withers, in Westminster Abbey, 1729.",
-                        "Epitaph. on Two Lovers Struck Dead by Lightning.",
-                        "Book IV. Ode I. to Venus.",
-                        "Part of the Ninth Ode of the Fourth Book.",
-                        "Autumn.",
-                        "Winter.",
-                        "Messiah.",
-                        "An Essay on Criticism.",
-                        "The Rape of the Lock:",
-                        "Two Choruses to the Tragedy of Brutus.",
-                        "Elegy to the Memory of an Unfortunate Lady",
-                        "Weeping.",
-                        "On Silence.",
-                        "Artemisia.",
-                        "Phryne.",
-                        "The Happy Life of a Country Parson.",
-                        "Epistle to Robert Earl of Oxford and Earl Mortimer.",
-                        "Epistle to Mr Jervas, With Mr Dryden's Translation of Fresnoy's 'art of Painting.'",
-                        "Epistle to Miss Blount, With the Works of Voiture.",
-                        "Epistle to Mrs Teresa Blount.  on Her Leaving the Town After the Coronation."
+                        "Poem 1", "Poem 2", "Poem 3"
                     }
                 },
                 new Author
@@ -68,39 +103,46 @@ namespace eSky.RecruitmentTask.Test.MockData
                     Name = "James Whitcomb Riley",
                     Poems = new List<string>
                     {
-                        "There Was a Cherry-Tree",
-                        "Liberty",
-                        "Who Bides His Time",
-                        "A Summer Afternoon",
-                        "Our Hired Girl",
-                        "A Life-Lesson",
-                        "The Song of Yesterday",
-                        "A Song of the Road",
-                        "Ike Walton's Prayer"
+                        "Poem 1", "Poem 2", "Poem 3"
                     }
-            },
+                },
                 new Author
                 {
                     Name = "Ann Taylor",
                     Poems = new List<string>
                     {
-                        "The Baby's Dance",
-                        "About the Little Girl that Beat Her Sister",
-                        "The Star",
-                        "For a Naughty Little Girl",
-                        "The Little Cripple's Complaint"
+                        "Poem 1", "Poem 2", "Poem 3"
                     }
                 }
             };
+            return listOfAuthors;
         }
 
-        public static List<Author> GetPoemsByAuthorNoData(List<string> authors)
+        public static IEnumerable<Author> NoPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors)
         {
-            if (authors == null && !authors.Any())
-                throw new ArgumentOutOfRangeException("No authors", nameof(authors));
+            if ((poems == null) || (!poems.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.INCORRECT_NUMBER_OF_POEMS, nameof(poems));
+            }
 
-            return new List<Author>();
+            if ((authors == null) || (!authors.Any()))
+            {
+                throw new ArgumentOutOfRangeException(ErrorMessages.LIST_OF_AUTHORS_CANT_BE_NULL_OR_EMPTY, nameof(authors));
+            }
 
+            IEnumerable<Author> listOfAuthors = new List<Author> {};
+            return listOfAuthors;
         }
+
+
+
+
+
+
+
+
+
+
+
     }
 }

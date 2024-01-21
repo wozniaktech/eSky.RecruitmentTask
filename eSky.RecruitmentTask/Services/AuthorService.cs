@@ -100,7 +100,7 @@ namespace eSky.RecruitmentTask.Services
             return poems;
         }
 
-        public async Task <IEnumerable<Author>> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors)
+        public IEnumerable<Author> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors)
         {
             if ((poems == null) || (!poems.Any()))
             {

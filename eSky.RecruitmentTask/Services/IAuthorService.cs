@@ -6,6 +6,6 @@ namespace eSky.RecruitmentTask.Services
     {
         Task<IEnumerable<string>> GetAuthors(int numberOfAuthors);
         Task<IEnumerable<Poem>> GetPoems(IEnumerable<string> authors);
-        Task <IEnumerable<Author>> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors);
+        IEnumerable<Author> GetPoemsByAuthor(IEnumerable<Poem>? poems, IEnumerable<string> authors);
     }
 }
