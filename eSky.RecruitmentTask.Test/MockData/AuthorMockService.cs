@@ -55,7 +55,7 @@ namespace eSky.RecruitmentTask.Test.MockData
                      new Poem
                {
                    Title = "Some title",
-                   Author = "",
+                   Author = "Ann Taylor",
                    Lines = new List<string> {"Line1","Line2","Line3"},
                    Linecount = "Linecount"
                }
@@ -133,6 +133,8 @@ namespace eSky.RecruitmentTask.Test.MockData
             IEnumerable<Author> listOfAuthors = new List<Author> {};
             return listOfAuthors;
         }
+
+
 
 
 
