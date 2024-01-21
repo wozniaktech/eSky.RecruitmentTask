@@ -7,7 +7,8 @@ namespace eSky.RecruitmentTask.Services
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger _logger;
 
-        public HttpService(IHttpClientFactory httpClientFactory, 
+        public HttpService(
+            IHttpClientFactory httpClientFactory, 
             ILogger<HttpService> logger)
         {
             _httpClientFactory = httpClientFactory;
